@@ -5,7 +5,7 @@ csv.sort(function(a,b) {return b.game - a.game;});
 */
 var width = 1200,
     height = 600, 
-    margin = 100;
+    margin = 70;
 /*
 var svg=d3.select("body").append("svg").attr("width",width).attr("height",height);
 var x=d3.scale.linear().domain([0,d3.max(data, function(d) { return d.game; })])
@@ -17,7 +17,7 @@ var r=d3.scale.linear().domain([0,500])
 var o=d3.scale.linear().domain([10000,100000]).range([.5,1]);
 var c=d3.scale.category10().domain(["Africa","America","Asia","Europe","Oceania"]);
 */
-var svg=d3.select("body").append("svg").attr("width",width).attr("height",height);
+var svg=d3.select(".chart").append("svg").attr("width",width).attr("height",height);
 var x=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.game; })])
                        .range([margin,width-margin]);
 var y=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.points; })])
@@ -46,18 +46,26 @@ svg.append("g")
   .attr("transform", "translate(" + margin + ",0)")
   .call(yAxis);
 
+/*
+svg.append("text")
+  .attr("class", "charttitle")
+  .attr("x", width/2 - 10)             
+  .attr("y", margin/2)
+  .attr("text-anchor", "middle")  
+  .html('Stephen Curry 2014-15: Effects of Individual Stats on Wins');
+*/
 svg.append("text")
     .attr("class", "xlabel")
     .attr("text-anchor", "middle")
-    .attr("x", (width)/2)
-    .attr("y", height - 50)
+    .attr("x", width/2)
+    .attr("y", height-10)
     .text("Games");
 
 svg.append("text")
     .attr("class", "ylabel")
     .attr("text-anchor", "middle")
     .attr("x", -height/2)
-    .attr("y", margin - 60)
+    .attr("y", margin - 70)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
     .text("Points");
@@ -81,11 +89,9 @@ svg.selectAll("circle").data(stats).enter()
   .attr("cx",function(d) {return x(+d.game);})
   .attr("cy",function(d) {return y(0);})
   .attr("r",function(d) {return r(0);})
-
   .style("fill",function(d) {return c(d.outcome[0])})
-
-    .append("title")
-    .text(function(d) {return d.opponent + ' ' + d.outcome + ' ' + d.gamescore;})
+  .append("title")
+  .html(function(d) {return 'Opponent: ' + d.opponent + '<br/>Points: ' + d.points + '<br/>Outcome: ' + d.outcome + '<br/>Gamescore: ' + d.gamescore;})
  
 // now we initiate - moving the marks to their position
 
