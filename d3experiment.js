@@ -5,7 +5,7 @@ csv.sort(function(a,b) {return b.game - a.game;});
 */
 var width = 1200,
     height = 600, 
-    margin = 50;
+    margin = 100;
 /*
 var svg=d3.select("body").append("svg").attr("width",width).attr("height",height);
 var x=d3.scale.linear().domain([0,d3.max(data, function(d) { return d.game; })])
@@ -45,6 +45,22 @@ svg.append("g")
   .attr("class", "axis")
   .attr("transform", "translate(" + margin + ",0)")
   .call(yAxis);
+
+svg.append("text")
+    .attr("class", "xlabel")
+    .attr("text-anchor", "middle")
+    .attr("x", (width)/2)
+    .attr("y", height - 50)
+    .text("Games");
+
+svg.append("text")
+    .attr("class", "ylabel")
+    .attr("text-anchor", "middle")
+    .attr("x", -height/2)
+    .attr("y", margin - 60)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Points");
 
 /*
 
