@@ -1,11 +1,24 @@
-/*d3.csv("https://www.kimonolabs.com/api/csv/6p063nz2?apikey=TIGMQy4hT6wns5yoxT1XgNlO6x1xlcWs&kimnoheaders=1",
-  function(csv) {
+var opts = {
+   lines: 13, // The number of lines to draw
+   length: 7, // The length of each line
+   width: 4, // The line thickness
+   radius: 10, // The radius of the inner circle
+   rotate: 0, // The rotation offset
+   color: '#b3b3b3', // #rgb or #rrggbb
+   speed: 0.75, // Rounds per second
+   trail: 50, // Afterglow percentage
+   shadow: false, // Whether to render a shadow
+   hwaccel: false, // Whether to use hardware acceleration
+   className: 'spinner', // The CSS class to assign to the spinner
+   zIndex: 2e9, // The z-index (defaults to 2000000000)
+   top: 'auto', // Top position relative to parent in px
+   left: 'auto' // Left position relative to parent in px
+};
 
-csv.sort(function(a,b) {return b.game - a.game;});
-*/
 function kimonoCallback(data) {
 var stats = data.results.collection1;
-console.log(data);
+spinner.stop();
+$('#spinner_center').remove();
 
 var x=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.game; })])
                        .range([margin,width-margin]);
@@ -53,9 +66,7 @@ svg.append("text")
   .attr("transform", "rotate(-90)")
   .text("Points");
 
-var div = d3.select("svg").append("div")   
-    .attr("class", "tooltip")               
-    .style("opacity", 0);
+// start with circles at bottom
 
 svg.selectAll("circle").data(stats).enter()
   .append("circle")
@@ -65,13 +76,15 @@ svg.selectAll("circle").data(stats).enter()
   .style("fill",function(d) {return c(d.outcome[0])})
   .append("title")
   .html(function(d) {return 'Opponent: ' + d.opponent + '<br/>Outcome: ' + d.outcome + '<br/>Gamescore: ' + d.gamescore;})
-// now we initiate - moving the marks to their position
+
+// initiate circles and move to position
 
 svg.selectAll("circle").transition().duration(1000)
   .attr("cx",function(d) {return x(+d.game);})
   .attr("cy",function(d) {return y(+d.points);})
   .attr("r",function(d) {return r(+d.gamescore);})
   
+$('select').removeAttr('disabled');
 
 var update = function(updatestat) {
 
@@ -86,17 +99,20 @@ var update = function(updatestat) {
      .attr("r",function(d) {return r(+d.gamescore);})
   }
 
-
-
-$('select').on('change',function(){
-  console.log(this.value);
-  //console.log(this.html);
-  update(this.value);
-})
-
+  $('select').on('change',function(){
+    update(this.value);
+  })
 };
 
+$('select').attr('disabled', 'disabled');
+
+var spinner = new Spinner(opts);
+
 $.ajax({
+    "beforeSend": function() {
+      $('<div id ="spinner_center" style="position:relative;display:block;width:50%;height:50%;top:300px;left:600px;"></div>').appendTo('.chart');
+      spinner.spin($('#spinner_center')[0]);
+    },
     "url":"https://www.kimonolabs.com/api/6p063nz2?apikey=TIGMQy4hT6wns5yoxT1XgNlO6x1xlcWs&callback=kimonoCallback",
     "crossDomain":true,
     "dataType":"jsonp"
