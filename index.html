@@ -4,10 +4,24 @@
     <link rel='stylesheet' type='css' href='styles.css'>
   </head>
   <body>
-  	<div class = "charttitle">Stephen Curry 2014-15:<br/> Effects of Individual Stats on Wins</div>
-    <div class = "chart"></div>
-    <div class="description"><p>Size of circles are proportional to the Gamescore for each game. Gamescore is a measure of how well a player did in the game by combining every stat with a weighted formula. The formula for GameScore is:</p><p> (#Points) + (0.4 * #Field Goals) - (0.7 * #Field Goals Attempted) - 0.4 * (#Free Throws Attempted - #Free Throws Made) + (0.7 * #Offensive Rebounds) + (0.3 * #Defensive Rebounds) + #Steals + (0.7 * #Assists) + (0.7 * #Blocks) - 0.4 * (#Personal Fouls) - #Turnovers = GameScore.</p></div>
+  	<div class="charttitle">Stephen Curry 2014-15:<br/><div class="subtext">Effects of Individual Stats on Game Outcome</div></div>
+  	<div class="selection">Track Stat: <select>
+  		<option value='points'>Points</option>
+  		<option value='fieldgoalper'>Field Goal %</option>
+  		<option value='freethrowper'>Free Throw %</option>
+  		<option value='threepointers'>Threes Made</option>
+  		<option value='rebounds'>Rebounds</option>
+  		<option value='assists'>Assists</option>
+  		<option value='steals'>Steals</option>
+  		<option value='blocks'>Blocks</option>
+  		<option value='turnovers'>Turnovers</option>
+  		<option value='fouls'>Fouls</option>
+  		<option value='plusminus'>+/-</option>
+  	</select></div>
+    <div class="chart"></div>
+    <div class="description"><p>Size of circles are proportional to the Gamescore for each game. Gamescore is a measure of how well a player did in the game by combining every stat with a weighted formula. The formula for GameScore is:</p><p> (#Points) + (0.4 * #Field Goals) - (0.7 * #Field Goals Attempted) - 0.4 * (#Free Throws Attempted - #Free Throws Made) + (0.7 * #Offensive Rebounds) + (0.3 * #Defensive Rebounds) + #Steals + (0.7 * #Assists) + (0.7 * #Blocks) - (0.4 * #Personal Fouls) - #Turnovers = GameScore.</p></div>
     <script src="d3.js" charset="utf-8"></script>
+    <script src="jquery-1.11.2.min.js"></script>
     <script src="stats.js"></script>
     <script src="d3experiment.js"></script>
   </body>
