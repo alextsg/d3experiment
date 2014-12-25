@@ -16,88 +16,105 @@ var opts = {
 };
 
 function kimonoCallback(data) {
-var stats = data.results.collection1;
-spinner.stop();
-$('#spinner_center').remove();
+  var stats = data.results.collection1;
+  spinner.stop();
+  $('#spinner_center').remove();
 
-var x=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.game; })])
-                       .range([margin,width-margin]);
-var y=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.points; })])
-                       .range([height-margin,margin]);
-var r=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.gamescore; })])
-                       .range([0,20]);
-var o=d3.scale.linear().domain([10000,100000]).range([.5,1]);
-var c=d3.scale.ordinal().domain(["W","L"]).range(["#26E810","#E84956"]);
-var s=d3.scale.ordinal().domain(["points","fieldgoalper","freethrowper","threepointers","rebounds","assists","steals","blocks","turnovers","fouls","plusminus"])
-                        .range(["Points","Field Goal %","Free Throw %","Threes Made","Rebounds","Assists","Steals","Blocks","Turnovers","Fouls","+/-"]);
+  var x=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.game; })])
+                         .range([margin,width-margin]);
+  var y=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.points; })])
+                         .range([height-margin,margin]);
+  var r=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.gamescore; })])
+                         .range([0,20]);
+  var o=d3.scale.linear().domain([10000,100000]).range([.5,1]);
+  var c=d3.scale.ordinal().domain(["W","L"]).range(["#26E810","#E84956"]);
+  var s=d3.scale.ordinal().domain(["points","fieldgoalper","freethrowper","threepointers","rebounds","assists","steals","blocks","turnovers","fouls","plusminus"])
+                          .range(["Points","Field Goal %","Free Throw %","Threes Made","Rebounds","Assists","Steals","Blocks","Turnovers","Fouls","+/-"]);
 
-var xAxis = d3.svg.axis()
-  .scale(x)
-  .orient("bottom");
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
 
-var yAxis = d3.svg.axis()
-  .scale(y)
-  .orient("left");
+  var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
 
 
-svg.append("g")
-  .attr("class", "xaxis")
-  .attr("transform", "translate(0," + (height - margin) + ")")
-  .call(xAxis);
+  svg.append("g")
+    .attr("class", "xaxis")
+    .attr("transform", "translate(0," + (height - margin) + ")")
+    .call(xAxis);
 
-svg.append("g")
-  .attr("class", "yaxis")
-  .attr("transform", "translate(" + margin + ",0)")
-  .call(yAxis);
+  svg.append("g")
+    .attr("class", "yaxis")
+    .attr("transform", "translate(" + margin + ",0)")
+    .call(yAxis);
 
-svg.append("text")
-  .attr("class", "xlabel")
-  .attr("text-anchor", "middle")
-  .attr("x", width/2)
-  .attr("y", height-10)
-  .text("Games");
+  svg.append("text")
+    .attr("class", "xlabel")
+    .attr("text-anchor", "middle")
+    .attr("x", width/2)
+    .attr("y", height-10)
+    .text("Games");
 
-svg.append("text")
-  .attr("class", "ylabel")
-  .attr("text-anchor", "middle")
-  .attr("x", -height/2)
-  .attr("y", margin - 70)
-  .attr("dy", ".75em")
-  .attr("transform", "rotate(-90)")
-  .text("Points");
+  svg.append("text")
+    .attr("class", "ylabel")
+    .attr("text-anchor", "middle")
+    .attr("x", -height/2)
+    .attr("y", margin - 70)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Points");
 
-// start with circles at bottom
+  var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .text("a simple tooltip");
 
-svg.selectAll("circle").data(stats).enter()
-  .append("circle")
-  .attr("cx",function(d) {return x(+d.game);})
-  .attr("cy",function(d) {return y(0);})
-  .attr("r",function(d) {return r(0);})
-  .style("fill",function(d) {return c(d.outcome[0])})
-  .append("title")
-  .html(function(d) {return 'Opponent: ' + d.opponent + '<br/>Outcome: ' + d.outcome + '<br/>Gamescore: ' + d.gamescore;})
+  // start with circles at bottom
 
-// initiate circles and move to position
+  svg.selectAll("circle").data(stats).enter()
+    .append("circle")
+    .attr("cx",function(d) {return x(+d.game);})
+    .attr("cy",function(d) {return y(0);})
+    .attr("r",function(d) {return r(0);})
+    .style("fill",function(d) {return c(d.outcome[0])})
 
-svg.selectAll("circle").transition().duration(1000)
-  .attr("cx",function(d) {return x(+d.game);})
-  .attr("cy",function(d) {return y(+d.points);})
-  .attr("r",function(d) {return r(+d.gamescore);})
-  
-$('select').removeAttr('disabled');
 
-var update = function(updatestat) {
+  // initiate circles and move to position
 
-  y.domain([d3.min(stats, function(d) { return Math.min(0, +d[updatestat]); }), 
-            d3.max(stats, function(d) { return Math.max(1, +d[updatestat]); })]);
-  svg.select(".yaxis").call(yAxis);
-  svg.select(".ylabel").text(function(d) {return s(updatestat);});
-  var temp = s(updatestat);
   svg.selectAll("circle").transition().duration(1000)
-     .attr("cx",function(d) {return x(+d.game);})
-     .attr("cy",function(d) {return y(+d[updatestat]);})
-     .attr("r",function(d) {return r(+d.gamescore);})
-  }
+    .attr("cx",function(d) {return x(+d.game);})
+    .attr("cy",function(d) {return y(+d.points);})
+    .attr("r",function(d) {return r(+d.gamescore);})
+
+  svg.selectAll("circle").append("title")
+    .html(function(d) {return 'Opponent: ' + d.opponent + '<br/>Points: ' + d.points + '<br/>Outcome: ' + d.outcome + '<br/>Gamescore: ' + d.gamescore;})
+
+
+  //svg.selectAll("circle").on('mouseover', function(){console.log("hello");});
+
+
+    
+  $('select').removeAttr('disabled');
+
+  var update = function(updatestat) {
+
+    y.domain([d3.min(stats, function(d) { return Math.min(0, +d[updatestat]); }), 
+              d3.max(stats, function(d) { return Math.max(1, +d[updatestat]); })]);
+    svg.select(".yaxis").call(yAxis);
+    svg.select(".ylabel").text(function(d) {return s(updatestat);});
+    var temp = s(updatestat);
+    svg.selectAll("circle").transition().duration(1000)
+       .attr("cx",function(d) {return x(+d.game);})
+       .attr("cy",function(d) {return y(+d[updatestat]);})
+       .attr("r",function(d) {return r(+d.gamescore);});
+
+    svg.selectAll("circle").select("title")
+       .html(function(d) {return 'Opponent: ' + d.opponent + '<br/>' + s(updatestat) + ': ' + d[updatestat] + '<br/>Outcome: ' + d.outcome + '<br/>Gamescore: ' + d.gamescore;});
+  };
 
   $('select').on('change',function(){
     update(this.value);
