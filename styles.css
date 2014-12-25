@@ -44,8 +44,28 @@ body {
   margin-bottom: 10px;
 }
 
+.tidbit {
+  margin: 50px 60px 25px 60px;
+  font-family: sans-serif;
+  font-size: 16px;
+  color:#333333;
+  text-align:left;
+}
+
+.green {
+  color: #26E810;
+  font-weight: bold;
+  display:inline;
+}
+
+.red {
+  color: #E84956;
+  font-weight: bold;
+  display:inline;
+}
+
 .description {
-  margin: 60px;
+  margin: 0px 60px 60px 60px;
   font-family: sans-serif;
   font-size: 16px;
   color:#333333;
@@ -57,17 +77,4 @@ body {
   margin-right:auto;
   height:600px;
   width:1200px;
-}
-
-div.tooltip {   
-  position: absolute;           
-  text-align: center;           
-  width: 60px;                  
-  height: 28px;                 
-  padding: 2px;             
-  font: 12px sans-serif;        
-  background: lightsteelblue;   
-  border: 0px;      
-  border-radius: 8px;           
-  pointer-events: none;         
 }

@@ -17,8 +17,10 @@ var opts = {
 
 function kimonoCallback(data) {
   var stats = data.results.collection1;
-  spinner.stop();
-  $('#spinner_center').remove();
+  spinner.stop();                 // stops the loading spinner
+  $('#spinner_center').remove();  // removes the loading spinner div
+
+  // various scales for mapping domains to ranges
 
   var x=d3.scale.linear().domain([0,d3.max(stats, function(d) { return +d.game; })])
                          .range([margin,width-margin]);
@@ -31,6 +33,8 @@ function kimonoCallback(data) {
   var s=d3.scale.ordinal().domain(["points","fieldgoalper","freethrowper","threepointers","rebounds","assists","steals","blocks","turnovers","fouls","plusminus"])
                           .range(["Points","Field Goal %","Free Throw %","Threes Made","Rebounds","Assists","Steals","Blocks","Turnovers","Fouls","+/-"]);
 
+// create axes
+
   var xAxis = d3.svg.axis()
     .scale(x)
     .orient("bottom");
@@ -38,7 +42,6 @@ function kimonoCallback(data) {
   var yAxis = d3.svg.axis()
     .scale(y)
     .orient("left");
-
 
   svg.append("g")
     .attr("class", "xaxis")
@@ -49,6 +52,8 @@ function kimonoCallback(data) {
     .attr("class", "yaxis")
     .attr("transform", "translate(" + margin + ",0)")
     .call(yAxis);
+
+// add text to axes
 
   svg.append("text")
     .attr("class", "xlabel")
@@ -66,14 +71,7 @@ function kimonoCallback(data) {
     .attr("transform", "rotate(-90)")
     .text("Points");
 
-  var tooltip = d3.select("body")
-    .append("div")
-    .style("position", "absolute")
-    .style("z-index", "10")
-    .style("visibility", "hidden")
-    .text("a simple tooltip");
-
-  // start with circles at bottom
+// start with circles at bottom
 
   svg.selectAll("circle").data(stats).enter()
     .append("circle")
@@ -82,8 +80,7 @@ function kimonoCallback(data) {
     .attr("r",function(d) {return r(0);})
     .style("fill",function(d) {return c(d.outcome[0])})
 
-
-  // initiate circles and move to position
+// initiate circles and move to position
 
   svg.selectAll("circle").transition().duration(1000)
     .attr("cx",function(d) {return x(+d.game);})
@@ -93,12 +90,51 @@ function kimonoCallback(data) {
   svg.selectAll("circle").append("title")
     .html(function(d) {return 'Opponent: ' + d.opponent + '<br/>Points: ' + d.points + '<br/>Outcome: ' + d.outcome + '<br/>Gamescore: ' + d.gamescore;})
 
+// makes 'Track Stat' select disabled while ajax loading  
 
-  //svg.selectAll("circle").on('mouseover', function(){console.log("hello");});
-
-
-    
   $('select').removeAttr('disabled');
+
+// variables for calculations
+
+  var games = stats.length;
+  var wins = function(allstats) {
+    return allstats.filter(function(element,index){
+      return element.outcome[0] === "W";
+    }).length;
+  }(stats);
+  var losses = games - wins;
+  var average = function(array, count) {
+    var sum = array.reduce(function(a,b){
+      return (+a) + (+b);
+    });
+    var temp = sum / count;
+    return (Math.ceil(temp*100)/100).toFixed(2);
+  };
+  var averageper = function(array, count) {
+    var sum = array.reduce(function(a,b){
+      return (+a) + (+b);
+    });
+    var temp = sum / count;
+    return (Math.ceil(temp*1000)/1000).toFixed(3);
+  }
+  var winarray = function(statistic){
+    return stats.filter(function(element,index){
+      return element.outcome[0] === "W";
+    }).map(function(element){
+      return element[statistic];
+    });
+  };
+  var losearray = function(statistic){
+    return stats.filter(function(element,index){
+      return element.outcome[0] === "L";
+    }).map(function(element){
+      return element[statistic];
+    });
+  };
+
+  var winstat = average(winarray("points"), wins);
+  var losestat = average(losearray("points"), losses);
+  $('.tidbit').html("In the Warriors' <div class='green'>" + wins + "</div> wins, Curry averaged <div class='green'>" + winstat + "</div> points.<br/>In the Warriors' <div class='red'>" + losses + "</div> losses, Curry averaged <div class='red'>" + losestat + "</div> points.");
 
   var update = function(updatestat) {
 
@@ -114,6 +150,15 @@ function kimonoCallback(data) {
 
     svg.selectAll("circle").select("title")
        .html(function(d) {return 'Opponent: ' + d.opponent + '<br/>' + s(updatestat) + ': ' + d[updatestat] + '<br/>Outcome: ' + d.outcome + '<br/>Gamescore: ' + d.gamescore;});
+
+    if (updatestat === "fieldgoalper" || updatestat === "freethrowper") {
+      var winstat = averageper(winarray(updatestat), wins);
+      var losestat = averageper(losearray(updatestat), losses);
+    } else {
+      var winstat = average(winarray(updatestat), wins);
+      var losestat = average(losearray(updatestat), losses);
+    }
+    $('.tidbit').html("In the Warriors' <div class='green'>" + wins + "</div> wins, Curry averaged <div class='green'>" + winstat + "</div> " + s(updatestat) + ".<br/>In the Warriors' <div class='red'>" + losses + "</div> losses, Curry averaged <div class='red'>" + losestat + "</div> " + s(updatestat) + ".");
   };
 
   $('select').on('change',function(){
