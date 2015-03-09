@@ -175,7 +175,7 @@ $.ajax({
       $('<div id ="spinner_center" style="position:relative;display:block;width:50%;height:50%;top:300px;left:600px;"></div>').appendTo('.chart');
       spinner.spin($('#spinner_center')[0]);
     },
-    "url":"https://www.kimonolabs.com/api/6p063nz2?apikey=TIGMQy4hT6wns5yoxT1XgNlO6x1xlcWs&callback=kimonoCallback",
+    "url":"https://www.kimonolabs.com/api/6p063nz2?apikey=TIGMQy4hT6wns5yoxT1XgNlO6x1xlcWs&kimmodify=1&callback=kimonoCallback",
     "crossDomain":true,
     "dataType":"jsonp"
 });
