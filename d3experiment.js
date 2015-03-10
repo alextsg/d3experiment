@@ -16,7 +16,9 @@ var opts = {
 };
 
 function kimonoCallback(data) {
-  var stats = data.results.collection1;
+  var stats = data.results.collection1.filter(function(game) {
+    return !!game.game;
+  });
   spinner.stop();                 // stops the loading spinner
   $('#spinner_center').remove();  // removes the loading spinner div
 
@@ -171,13 +173,15 @@ $('select').attr('disabled', 'disabled');
 var spinner = new Spinner(opts);
 
 $.ajax({
-    "beforeSend": function() {
+    beforeSend : function() {
       $('<div id ="spinner_center" style="position:relative;display:block;width:50%;height:50%;top:300px;left:600px;"></div>').appendTo('.chart');
       spinner.spin($('#spinner_center')[0]);
     },
-    "url":"https://www.kimonolabs.com/api/6p063nz2?apikey=TIGMQy4hT6wns5yoxT1XgNlO6x1xlcWs&kimmodify=1&callback=kimonoCallback",
-    "crossDomain":true,
-    "dataType":"jsonp"
+    type : 'GET',
+    url : 'https://www.kimonolabs.com/api/6p063nz2?apikey=TIGMQy4hT6wns5yoxT1XgNlO6x1xlcWs',
+    crossDomain : true,
+    dataType : 'jsonp',
+    success : kimonoCallback
 });
 
 var width = 1200,
